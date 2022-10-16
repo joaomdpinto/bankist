@@ -34,6 +34,7 @@ const account4 = {
 };
 
 const accounts = [account1, account2, account3, account4];
+let currentAccount;
 
 // Elements
 const labelWelcome = document.querySelector('.welcome');
@@ -80,8 +81,6 @@ const displayMovements = function (movements) {
   });
 };
 
-displayMovements(account1.movements);
-
 const createUsernames = function (accounts) {
   accounts.forEach(
     user =>
@@ -100,18 +99,18 @@ const calcPrintBalance = movements => {
   )} €`;
 };
 
-const calcDisplaySummary = movements => {
-  const summaryIn = movements
+const calcDisplaySummary = account => {
+  const summaryIn = account.movements
     .filter(move => move > 0)
     .reduce((sum, move) => sum + move, 0);
 
-  const summaryOut = movements
+  const summaryOut = account.movements
     .filter(move => move <= 0)
     .reduce((sum, move) => sum + move, 0);
 
-  const interest = movements
+  const interest = account.movements
     .filter(move => move > 0)
-    .map(deposit => (deposit * 1.2) / 100)
+    .map(deposit => (deposit * account.interestRate) / 100)
     .filter(int => int >= 1)
     .reduce((sum, move) => sum + move, 0);
 
@@ -121,9 +120,35 @@ const calcDisplaySummary = movements => {
 };
 
 createUsernames(accounts);
-calcPrintBalance(account1.movements);
-calcDisplaySummary(account1.movements);
 
-//maximum value
-const max = movements =>
-  movements.reduce((max, curr) => (curr > max ? curr : max), movements[0]);
+//Event handler
+const login = function (e) {
+  e.preventDefault();
+
+  currentAccount = accounts.find(
+    account =>
+      account.username === inputLoginUsername.value &&
+      account.pin === Number(inputLoginPin.value)
+  );
+
+  if (currentAccount) {
+    //CALCULATE AND DISPLAY MOVEMENTS, BALACE AND SUMMARY
+    displayMovements(currentAccount.movements);
+    calcPrintBalance(currentAccount.movements);
+    calcDisplaySummary(currentAccount);
+
+    //WELCOME MESSAGE AND DISPLAY APP CONTENT
+    labelWelcome.textContent = `Welcome back, ${currentAccount.owner
+      .split(' ')
+      .at(0)}`;
+    containerApp.style.opacity = 100;
+
+    //CLEAN USER AND PIN INPUT FIELDS
+    inputLoginUsername.value = inputLoginPin.value = '';
+    inputLoginPin.blur();
+  } else {
+    console.log('username and password incorrect. try again!');
+  }
+};
+
+btnLogin.addEventListener('click', login);
