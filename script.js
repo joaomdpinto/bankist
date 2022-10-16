@@ -100,7 +100,30 @@ const calcPrintBalance = movements => {
   )} €`;
 };
 
+const calcDisplaySummary = movements => {
+  const summaryIn = movements
+    .filter(move => move > 0)
+    .reduce((sum, move) => sum + move, 0);
+
+  const summaryOut = movements
+    .filter(move => move <= 0)
+    .reduce((sum, move) => sum + move, 0);
+
+  const interest = movements
+    .filter(move => move > 0)
+    .map(deposit => (deposit * 1.2) / 100)
+    .filter(int => int >= 1)
+    .reduce((sum, move) => sum + move, 0);
+
+  labelSumIn.textContent = `${summaryIn}€`;
+  labelSumOut.textContent = `${Math.abs(summaryOut)}€`;
+  labelSumInterest.textContent = `${interest}€`;
+};
+
 createUsernames(accounts);
 calcPrintBalance(account1.movements);
+calcDisplaySummary(account1.movements);
 
-const withdrawals = movements => movements.filter(movement => movement < 0);
+//maximum value
+const max = movements =>
+  movements.reduce((max, curr) => (curr > max ? curr : max), movements[0]);
