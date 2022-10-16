@@ -61,16 +61,46 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// LECTURES
+const displayMovements = function (movements) {
+  //clean movements
+  containerMovements.innerHTML = '';
 
-const currencies = new Map([
-  ['USD', 'United States dollar'],
-  ['EUR', 'Euro'],
-  ['GBP', 'Pound sterling'],
-]);
+  //insert movements
+  movements.forEach((mov, i) => {
+    const type = mov > 0 ? 'deposit' : 'withdrawal';
 
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+    const html = `<div class="movements__row">
+                    <div class="movements__type movements__type--${type}">${
+      i + 1
+    } ${type}</div>
+                    <div class="movements__value">${mov}€</div>
+                  </div>`;
 
-/////////////////////////////////////////////////
+    containerMovements.insertAdjacentHTML('afterbegin', html);
+  });
+};
+
+displayMovements(account1.movements);
+
+const createUsernames = function (accounts) {
+  accounts.forEach(
+    user =>
+      (user.username = user.owner
+        .toLowerCase()
+        .split(' ')
+        .map(name => name.charAt(0))
+        .join(''))
+  );
+};
+
+const calcPrintBalance = movements => {
+  labelBalance.textContent = `${movements.reduce(
+    (sumMovements, currentMovement) => sumMovements + currentMovement,
+    0
+  )} €`;
+};
+
+createUsernames(accounts);
+calcPrintBalance(account1.movements);
+
+const withdrawals = movements => movements.filter(movement => movement < 0);
