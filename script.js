@@ -92,11 +92,12 @@ const createUsernames = function (accounts) {
   );
 };
 
-const calcPrintBalance = movements => {
-  labelBalance.textContent = `${movements.reduce(
+const calcPrintBalance = account => {
+  account.balance = account.movements.reduce(
     (sumMovements, currentMovement) => sumMovements + currentMovement,
     0
-  )} €`;
+  );
+  labelBalance.textContent = `${account.balance} €`;
 };
 
 const calcDisplaySummary = account => {
@@ -121,7 +122,15 @@ const calcDisplaySummary = account => {
 
 createUsernames(accounts);
 
+//CALCULATE AND DISPLAY MOVEMENTS, BALACE AND SUMMARY
+const updateUI = () => {
+  displayMovements(currentAccount.movements);
+  calcPrintBalance(currentAccount);
+  calcDisplaySummary(currentAccount);
+};
 //Event handler
+
+//LOGIN
 const login = function (e) {
   e.preventDefault();
 
@@ -132,11 +141,7 @@ const login = function (e) {
   );
 
   if (currentAccount) {
-    //CALCULATE AND DISPLAY MOVEMENTS, BALACE AND SUMMARY
-    displayMovements(currentAccount.movements);
-    calcPrintBalance(currentAccount.movements);
-    calcDisplaySummary(currentAccount);
-
+    updateUI();
     //WELCOME MESSAGE AND DISPLAY APP CONTENT
     labelWelcome.textContent = `Welcome back, ${currentAccount.owner
       .split(' ')
@@ -151,4 +156,31 @@ const login = function (e) {
   }
 };
 
+//TRANSFER
+const transfer = function (e) {
+  e.preventDefault();
+
+  const receiverAccount = accounts.find(
+    account =>
+      account.username === inputTransferTo.value &&
+      currentAccount.username !== inputTransferTo.value
+  );
+
+  const amount = Number(inputTransferAmount.value);
+
+  if (receiverAccount && amount > 0 && currentAccount.balance >= amount) {
+    currentAccount.movements.push(-amount);
+    receiverAccount.movements.push(amount);
+
+    updateUI();
+
+    inputTransferTo.value = inputTransferAmount.value = '';
+    inputTransferTo.blur();
+    inputTransferAmount.blur();
+  } else {
+    console.log('Transfer invelid!');
+  }
+};
+
 btnLogin.addEventListener('click', login);
+btnTransfer.addEventListener('click', transfer);
