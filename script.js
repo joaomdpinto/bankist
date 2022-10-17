@@ -128,8 +128,22 @@ const updateUI = () => {
   calcPrintBalance(currentAccount);
   calcDisplaySummary(currentAccount);
 };
-//Event handler
 
+//WELCOME MESSAGE AND DISPLAY APP CONTENT
+const loginUI = () => {
+  labelWelcome.textContent = `Welcome back, ${currentAccount.owner
+    .split(' ')
+    .at(0)}`;
+  containerApp.style.opacity = 100;
+};
+
+//RESET APPLICATION
+const logoutUI = () => {
+  labelWelcome.textContent = 'Log in to get started';
+  containerApp.style.opacity = 0;
+};
+
+//Event handler
 //LOGIN
 const login = function (e) {
   e.preventDefault();
@@ -142,12 +156,7 @@ const login = function (e) {
 
   if (currentAccount) {
     updateUI();
-    //WELCOME MESSAGE AND DISPLAY APP CONTENT
-    labelWelcome.textContent = `Welcome back, ${currentAccount.owner
-      .split(' ')
-      .at(0)}`;
-    containerApp.style.opacity = 100;
-
+    loginUI();
     //CLEAN USER AND PIN INPUT FIELDS
     inputLoginUsername.value = inputLoginPin.value = '';
     inputLoginPin.blur();
@@ -178,9 +187,29 @@ const transfer = function (e) {
     inputTransferTo.blur();
     inputTransferAmount.blur();
   } else {
-    console.log('Transfer invelid!');
+    console.log('Transfer invalid!');
+  }
+};
+
+//CLOSE ACCOUNT
+const close = function (e) {
+  e.preventDefault();
+
+  const accountIndex = accounts.findIndex(
+    account =>
+      account.username === currentAccount.username &&
+      account.username === inputCloseUsername.value &&
+      account.pin === Number(inputClosePin.value)
+  );
+
+  if (accountIndex != -1) {
+    accounts.splice(accountIndex, 1);
+    logoutUI();
+  } else {
+    console.log("It's not possible close this account. Try again!");
   }
 };
 
 btnLogin.addEventListener('click', login);
 btnTransfer.addEventListener('click', transfer);
+btnClose.addEventListener('click', close);
