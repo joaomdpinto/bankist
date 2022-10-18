@@ -210,6 +210,25 @@ const close = function (e) {
   }
 };
 
+//LOAN
+const loan = function (e) {
+  e.preventDefault();
+  const amount = Number(inputLoanAmount.value);
+
+  if (
+    amount > 0 &&
+    currentAccount.movements.some(move => move >= amount * 0.1)
+  ) {
+    currentAccount.movements.push(amount);
+    updateUI();
+    inputLoanAmount.value = '';
+    inputLoanAmount.blur();
+  } else {
+    console.log('Loan request invalid!');
+  }
+};
+
 btnLogin.addEventListener('click', login);
 btnTransfer.addEventListener('click', transfer);
 btnClose.addEventListener('click', close);
+btnLoan.addEventListener('click', loan);
